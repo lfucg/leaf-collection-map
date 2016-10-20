@@ -32,13 +32,14 @@
 
   var leaves = L.esri.dynamicMapLayer({
     url: "https://maps.lexingtonky.gov/lfucggis/rest/services/leafcollection/MapServer",
+    opacity: .7,
   }).addTo(map);
 
   var arcgisOnline = L.esri.Geocoding.arcgisOnlineProvider();
 
   var addressPointsProvider = L.esri.Geocoding.mapServiceProvider({
     label: 'States and Counties',
-    url: 'http://maps.lexingtonky.gov/lfucggis/rest/services/addresses/MapServer',
+    url: 'https://maps.lexingtonky.gov/lfucggis/rest/services/addresses/MapServer',
     layers: [0],
     searchFields: ['ADDRESS'],
     formatSuggestion: function(feature) {
@@ -47,7 +48,11 @@
   });
 
   var searchControl = L.esri.Geocoding.geosearch({
-    providers: [ addressPointsProvider ]
+    providers: [ addressPointsProvider ],
+    zoomToResult: true,
+    expanded: true,
+    placeholder: 'type an address',
+    collapseAfterResult: false,
   }).addTo(map);
 
   // create an empty layer group to store the results and add it to the map
