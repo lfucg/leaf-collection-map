@@ -26,13 +26,12 @@
 
 <script>
   var addressLatLngGlobal = new L.LatLng(38.05193514322206, -84.49135992595838);
-  var map = L.map('map').setView(addressLatLngGlobal, 18);
+  var map = L.map('map').setView(addressLatLngGlobal, 13);
 
   L.esri.basemapLayer("Topographic").addTo(map);
 
   var leaves = L.esri.dynamicMapLayer({
     url: "https://maps.lexingtonky.gov/lfucggis/rest/services/leafcollection/MapServer",
-    layers: [5],
   }).addTo(map);
 
   var arcgisOnline = L.esri.Geocoding.arcgisOnlineProvider();
@@ -54,11 +53,9 @@
   // create an empty layer group to store the results and add it to the map
   var results = L.layerGroup().addTo(map);
 
-  var identifiedFeature;
 
   var displaySearchResults = function(data) {
     results.clearLayers();
-    identifiedFeature = undefined;
 
     var addressLatLng = data.results[0].latlng;
 
@@ -66,7 +63,9 @@
       if (featureCollection.features.length > 0) {
         var dates = featureCollection.features[0].properties['Dates'];
         if (!dates || dates === 'Null') {
-          dates = "Addressess must receive city waste pickup to qualify leaf collection";
+          dates = "Because this address does not receive city waste services, it does not receive city leaf collection. <p>Please visit <a href='https://lexingtonky.gov'>lexingtonky.gov</a> for details.<p>";
+        } else {
+          dates = dates + '<div><label>Sign up for notifications <input type="text"></label><input type="submit"></div>';
         }
         var popup = L.popup()
             .setLatLng(addressLatLng)
@@ -80,20 +79,6 @@
   displaySearchResults({results:[{latlng: addressLatLngGlobal}]});
 
   searchControl.on("results", displaySearchResults);
-
-  map.on('click', function (e) {
-    leaves.identify().on(map).at(e.latlng).run(function(error, featureCollection){
-      if (featureCollection.features.length > 0) {
-        identifiedFeature = L.geoJSON(featureCollection.features[0]).addTo(map);
-        var soilDescription = featureCollection.features[0].properties['Dates'];
-        console.log(soilDescription);
-        // pane.innerHTML = soilDescription;
-      }
-      else {
-        // pane.innerHTML = 'No features identified.';
-      }
-    });
-  });
 </script>
 
 </body>
