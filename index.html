@@ -127,15 +127,18 @@
       var datesLanguage = '<h3>Leaf vacuuming in your area is currently scheduled: ' + dates + '</h3>';
       dates = datesLanguage + '<div class="citygram-form"><p>Sign up to receive text message notifications about your street\'s schedule.</p><p class="alert alert-error" style="display:none"></p><p class="sign-up"><label><strong>Enter your phone number (with area code)</strong> <input class="phone" name="phone" type="text"></label> <input type="submit" value="Notify me"></p></div>';
     }
-    var popup = L.popup()
+    var popup = L.popup({
+          closeButton: false,
+        })
         .setLatLng(addressLatLng)
         .setContent(dates)
         .openOn(map);
 
+    map.panBy(new L.Point(0, -100));
+
     $('input[type="submit"]').click(function() {
       postToCitygram(addressLatLng, $('.phone').val());
     });
-    map.setView(addressLatLng, 18)
   };
 
   var addInstructions = function(map) {
@@ -162,9 +165,10 @@
     providers: [ addressPointsProvider ],
     expanded: true,
     placeholder: 'type an address',
-    collapseAfterResult: true,
+    collapseAfterResult: false,
     allowMultipleResults: false,
     position: 'topright',
+    zoomToResult: true,
   }).addTo(map);
 
   // displaySearchResults({results:[{latlng: addressLatLngCollected}]});
@@ -198,7 +202,7 @@
       try {
         error = JSON.parse(response.responseText).error;
       } catch (e) {
-        error = 'There was a problem signing-up. Please email <a href="mailto:webmaster@lexingtonky.gov?subject=Unable+to+subscribe+to+citygram&body=Phone:' + $('.phone').val() + '">webmaster@lexingtonky.gov</a>';
+        error = 'There was a problem signing-up. Please contact <a href="mailto:webmaster@lexingtonky.gov?subject=Unable+to+subscribe+to+citygram&body=Phone:' + $('.phone').val() + '">webmaster@lexingtonky.gov</a>';
       }
       $('.alert-error').html(error).show();
     });
