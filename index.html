@@ -4,13 +4,8 @@
   <title>Esri Leaflet Quickstart</title>
   <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 
-  <!-- Load Leaflet from CDN-->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
-
-
-  <!-- Load Esri Leaflet from CDN -->
-  <script src="https://unpkg.com/esri-leaflet@2.0.4"></script>
+  <link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@2.1.4/dist/esri-leaflet-geocoder.css">
 
   <style>
     body { margin:0; padding:0; }
@@ -36,35 +31,39 @@
       background-color: #ffc2c2;
     }
 
+    .sign-up,
     .citygram-form input {
       height: 25px
     }
+    .sign-up {
+      padding-bottom: 10px;
+    }
     .citygram-form .phone {
       width: 220px;
+      border-right: none;
+    }
+    input {
+      border: 1px solid gray;
+      float: left;
+    }
+    .geocoder-control-input.geocoder-control-loading {
+      background-color: lightgray;
     }
   </style>
 
 </head>
 <body>
 
-<link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@2.1.4/dist/esri-leaflet-geocoder.css">
-<script src="https://unpkg.com/esri-leaflet-geocoder@2.1.4"></script>
 
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
+<script src="https://unpkg.com/esri-leaflet@2.0.4"></script>
+<script src="https://unpkg.com/esri-leaflet-geocoder@2.1.4"></script>
 <script
         src="https://code.jquery.com/jquery-1.12.4.min.js"
         integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
         crossorigin="anonymous"></script>
-
-<style>
-input {
-  border: 1px solid gray;
-}
-.geocoder-control-input.geocoder-control-loading {
-  background-color: lightgray;
-}
-</style>
-
-<div id="map"></div>
 
 <script>
   var addressLatLngNotCollected = new L.LatLng(38.05193514322206, -84.49135992595838);
@@ -126,7 +125,7 @@ input {
       dates = "Because this address does not receive city waste services, it will not receive vacuum leaf collection. <p>Please visit <a href='https://lexingtonky.gov/leaves'>lexingtonky.gov/leaves</a> for details.<p>";
     } else {
       var datesLanguage = '<h3>Leaf vacuuming in your area is currently scheduled: ' + dates + '</h3>';
-      dates = datesLanguage + '<div class="citygram-form"><p>Sign up to receive text message notifications about your street\'s schedule.</p><p class="alert alert-error" style="display:none"></p><p><label><strong>Phone number (with area code)</strong> <input class="phone" name="phone" type="text"></label> <input type="submit" value="Sign-up"></p></div>';
+      dates = datesLanguage + '<div class="citygram-form"><p>Sign up to receive text message notifications about your street\'s schedule.</p><p class="alert alert-error" style="display:none"></p><p class="sign-up"><label><strong>Enter your phone number (with area code)</strong> <input class="phone" name="phone" type="text"></label> <input type="submit" value="Notify me"></p></div>';
     }
     var popup = L.popup()
         .setLatLng(addressLatLng)
@@ -205,6 +204,5 @@ input {
     });
   }
 </script>
-
 </body>
 </html>
