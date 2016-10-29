@@ -181,10 +181,12 @@ input {
 
     var url = 'https://lexington-geocode-proxy.herokuapp.com/www.citygram.org/subscriptions'
 
+    var leafCollectionPublisherId = 12;
+
     var data = {
       'subscription[channel]': 'sms',
       'subscription[geom]': geom,
-      'subscription[publisher_id]': 14,
+      'subscription[publisher_id]': leafCollectionPublisherId,
       'subscription[phone_number]': phone,
     };
 
