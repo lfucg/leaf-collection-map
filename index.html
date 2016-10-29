@@ -5,8 +5,9 @@
   <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 
   <!-- Load Leaflet from CDN-->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.0/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.0.0/dist/leaflet-src.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
+
 
   <!-- Load Esri Leaflet from CDN -->
   <script src="https://unpkg.com/esri-leaflet@2.0.4"></script>
@@ -14,6 +15,33 @@
   <style>
     body { margin:0; padding:0; }
     #map { position: absolute; top:0; bottom:0; right:0; left:0; }
+    .info {
+      width: 275px;
+      background: white;
+    }
+    .info p {
+      margin: 5px;
+    }
+    .leaflet-top .leaflet-control {
+      margin-top: 5px;
+    }
+
+    .alert {
+      padding: 1em;
+    }
+    .alert-success {
+      background-color: #b0debb;
+    }
+    .alert-error {
+      background-color: #ffc2c2;
+    }
+
+    .citygram-form input {
+      height: 25px
+    }
+    .citygram-form .phone {
+      width: 220px;
+    }
   </style>
 
 </head>
@@ -22,23 +50,41 @@
 <link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@2.1.4/dist/esri-leaflet-geocoder.css">
 <script src="https://unpkg.com/esri-leaflet-geocoder@2.1.4"></script>
 
+<script
+        src="http://code.jquery.com/jquery-1.12.4.min.js"
+        integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
+        crossorigin="anonymous"></script>
+
+<style>
+input {
+  border: 1px solid gray;
+}
+.geocoder-control-input.geocoder-control-loading {
+  background-color: lightgray;
+}
+</style>
+
 <div id="map"></div>
 
 <script>
-  var addressLatLngGlobal = new L.LatLng(38.05193514322206, -84.49135992595838);
-  var map = L.map('map').setView(addressLatLngGlobal, 13);
+  var addressLatLngNotCollected = new L.LatLng(38.05193514322206, -84.49135992595838);
+  var addressLatLngCollected = new L.LatLng(38.05516033568126, -84.48380380868912);
+  var addressLatLngGlobal = addressLatLngNotCollected;
+  var map = L.map('map', {
+    scrollWheelZoom: false,
+  }).setView(addressLatLngGlobal, 12);
 
-  L.esri.basemapLayer("Topographic").addTo(map);
+  L.esri.basemapLayer("Streets").addTo(map);
 
   var leaves = L.esri.dynamicMapLayer({
     url: "https://maps.lexingtonky.gov/lfucggis/rest/services/leafcollection/MapServer",
-    opacity: .7,
   }).addTo(map);
 
-  var arcgisOnline = L.esri.Geocoding.arcgisOnlineProvider();
+  // var parcels = L.esri.dynamicMapLayer({
+  //   url: "https://maps.lexingtonky.gov/lfucggis/rest/services/parcels/MapServer",
+  // });
 
   var addressPointsProvider = L.esri.Geocoding.mapServiceProvider({
-    label: 'States and Counties',
     url: 'https://maps.lexingtonky.gov/lfucggis/rest/services/addresses/MapServer',
     layers: [0],
     searchFields: ['ADDRESS'],
@@ -47,43 +93,115 @@
     }
   });
 
-  var searchControl = L.esri.Geocoding.geosearch({
-    providers: [ addressPointsProvider ],
-    zoomToResult: true,
-    expanded: true,
-    placeholder: 'type an address',
-    collapseAfterResult: false,
-  }).addTo(map);
-
   // create an empty layer group to store the results and add it to the map
   var results = L.layerGroup().addTo(map);
-
 
   var displaySearchResults = function(data) {
     results.clearLayers();
 
     var addressLatLng = data.results[0].latlng;
 
-    leaves.identify().on(map).at(addressLatLng).run(function(error, featureCollection){
-      if (featureCollection.features.length > 0) {
-        var dates = featureCollection.features[0].properties['Dates'];
-        if (!dates || dates === 'Null') {
-          dates = "Because this address does not receive city waste services, it does not receive city leaf collection. <p>Please visit <a href='https://lexingtonky.gov'>lexingtonky.gov</a> for details.<p>";
-        } else {
-          dates = dates + '<div><label>Sign up for notifications <input type="text"></label><input type="submit"></div>';
+    leaves.identify()
+      .returnGeometry(false)
+      .tolerance(0)
+      .on(map)
+      .at(addressLatLng)
+      .run(function(error, featureCollection) {
+        // parcels.identify()
+        //   .returnGeometry(false)
+        //   .tolerance(0)
+        //   .on(map)
+        //   .at(addressLatLng)
+        //   .run(function(error, featureCollection) {
+        //   });
+
+        if (featureCollection.features.length > 0) {
+          showDatePopup(map, addressLatLng, featureCollection.features[0].properties['Dates']);
         }
-        var popup = L.popup()
-            .setLatLng(addressLatLng)
-            .setContent(dates)
-            .openOn(map);
-        map.setView(addressLatLng, 18)
-      }
     });
   }
 
-  displaySearchResults({results:[{latlng: addressLatLngGlobal}]});
+  var showDatePopup = function(map, addressLatLng, dates) {
+    if (!dates || dates === 'Null') {
+      dates = "Because this address does not receive city waste services, it will not receive vacuum leaf collection. <p>Please visit <a href='https://lexingtonky.gov/leaves'>lexingtonky.gov/leaves</a> for details.<p>";
+    } else {
+      var datesLanguage = '<h3>Leaf vacuuming in your area is currently scheduled: ' + dates + '</h3>';
+      dates = datesLanguage + '<div class="citygram-form"><p>Sign up to receive text message notifications about your street\'s schedule.</p><p class="alert alert-error" style="display:none"></p><p><label><strong>Phone number (with area code)</strong> <input class="phone" name="phone" type="text"></label> <input type="submit" value="Sign-up"></p></div>';
+    }
+    var popup = L.popup()
+        .setLatLng(addressLatLng)
+        .setContent(dates)
+        .openOn(map);
+
+    $('input[type="submit"]').click(function() {
+      postToCitygram(addressLatLng, $('.phone').val());
+    });
+    map.setView(addressLatLng, 18)
+  };
+
+  var addInstructions = function(map) {
+    var info = L.control({position: 'topright'});
+
+    info.onAdd = function (map) {
+        this._div = L.DomUtil.create('div', 'info leaflet-bar'); // create a div with a class "info"
+        this.update();
+        return this._div;
+    };
+
+    // method that we will use to update the control based on feature properties passed
+    info.update = function (props) {
+        this._div.innerHTML = '<p>Enter your address below</p4>';
+    };
+
+    info.addTo(map);
+  }
+
+  addInstructions(map);
+
+  // http://esri.github.io/esri-leaflet/api-reference/controls/geosearch.html
+  var searchControl = L.esri.Geocoding.geosearch({
+    providers: [ addressPointsProvider ],
+    expanded: true,
+    placeholder: 'type an address',
+    collapseAfterResult: false,
+    allowMultipleResults: false,
+    position: 'topright',
+  }).addTo(map);
+
+  // displaySearchResults({results:[{latlng: addressLatLngCollected}]});
+  // displaySearchResults({results:[{latlng: addressLatLngNotCollected}]});
 
   searchControl.on("results", displaySearchResults);
+
+  var postToCitygram = function(latLng, phone) {
+    var geom = JSON.stringify({
+      "type": "Point",
+      "coordinates": L.GeoJSON.latLngToCoords(latLng)
+    });
+
+    var url = 'https://lexington-geocode-proxy.herokuapp.com/www.citygram.org/subscriptions'
+
+    var data = {
+      'subscription[channel]': 'sms',
+      'subscription[geom]': geom,
+      'subscription[publisher_id]': 14,
+      'subscription[phone_number]': phone,
+    };
+
+    var success = function() {
+      $('.citygram-form').html('<p class="alert alert-success">Thanks! You will receive text messages as vacuum leaf collection continues. <br><br>Please visit <a href="https://lexingtonky.gov/leaves">lexingtonky.gov/leaves</a> for details.</p>');
+    }
+
+    $.post(url, data, success).error(function(response) {
+      var error;
+      try {
+        error = JSON.parse(response.responseText).error;
+      } catch (e) {
+        error = 'There was a problem signing-up. Please email <a href="mailto:webmaster@lexingtonky.gov?subject=Unable+to+subscribe+to+citygram&body=Phone:' + $('.phone').val() + '">webmaster@lexingtonky.gov</a>';
+      }
+      $('.alert-error').html(error).show();
+    });
+  }
 </script>
 
 </body>
