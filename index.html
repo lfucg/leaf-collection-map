@@ -71,7 +71,7 @@
   var addressLatLngGlobal = addressLatLngNotCollected;
   var map = L.map('map', {
     scrollWheelZoom: false,
-  }).setView(addressLatLngGlobal, 12);
+  }).setView(addressLatLngGlobal, 11);
 
   L.esri.basemapLayer("Streets").addTo(map);
 
@@ -162,7 +162,7 @@
     providers: [ addressPointsProvider ],
     expanded: true,
     placeholder: 'type an address',
-    collapseAfterResult: false,
+    collapseAfterResult: true,
     allowMultipleResults: false,
     position: 'topright',
   }).addTo(map);
