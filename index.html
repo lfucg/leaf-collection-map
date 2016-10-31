@@ -122,7 +122,7 @@
 
   var showDatePopup = function(map, addressLatLng, dates) {
     if (!dates || dates === 'Null') {
-      dates = "Because this address does not receive city waste services, it will not receive vacuum leaf collection. <p>Please visit <a href='https://lexingtonky.gov/leaves'>lexingtonky.gov/leaves</a> for details.<p>";
+      dates = "Because this address does not receive residential city waste services, it will not receive vacuum leaf collection. <p>Please visit <a href='https://lexingtonky.gov/leaves'>lexingtonky.gov/leaves</a> for details.<p>";
     } else {
       var datesLanguage = '<h3>Leaf vacuuming in your area is currently scheduled: ' + dates + '</h3>';
       dates = datesLanguage + '<div class="citygram-form"><p>Sign up to receive text message notifications about your street\'s schedule.</p><p class="alert alert-error" style="display:none"></p><p class="sign-up"><label><strong>Enter your phone number (with area code)</strong> <input class="phone" name="phone" type="text"></label> <input type="submit" value="Notify me"></p></div>';
