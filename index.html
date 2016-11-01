@@ -49,6 +49,25 @@
     .geocoder-control-input.geocoder-control-loading {
       background-color: lightgray;
     }
+    .legend {
+      background-color: white;
+      padding: 10px;
+      line-height: 18px;
+      color: #555;
+    }
+    .legend i {
+      width: 18px;
+      height: 18px;
+      float: left;
+      margin-right: 8px;
+      opacity: 0.7;
+    }
+    .legend-items {
+      display: none; /* click to show */
+    }
+    .legend-item {
+      padding-top: 10px;
+    }
   </style>
 
 </head>
@@ -211,6 +230,34 @@
       $('.alert-error').html(error).show();
     });
   }
+
+  var legendItem = function(key, color) {
+    return '<div class="legend-item"><i style="background:' + color + '"></i> ' + key + '</div>';
+  }
+  var addLegend = function(map) {
+    var legend = L.control({position: 'topleft'});
+
+    legend.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'legend');
+        div.innerHTML += '<div class="legend-toggle-container"><a href="#" class="legend-toggle">Legend</a></div>';
+        var items = L.DomUtil.create('div', 'legend-items');
+        items.innerHTML += legendItem('Collection in Progress', 'green');
+        items.innerHTML += legendItem('Collection Next in Queue', 'yellow');
+        items.innerHTML += legendItem('Collection Pending Assignment', 'red');
+        items.innerHTML += legendItem('Collection Completed', '#7c90f2');
+        items.innerHTML += legendItem('Does Not Receive Leaf Collection', 'white');
+        $(div).append(items);
+        return div;
+    };
+
+    legend.addTo(map);
+    $('.legend-toggle').click(function(e) {
+      e.preventDefault();
+      $('.legend-items').toggle();
+    });
+  }
+
+  addLegend(map);
 </script>
 </body>
 </html>
