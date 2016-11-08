@@ -98,10 +98,6 @@
     url: "https://maps.lexingtonky.gov/lfucggis/rest/services/leafcollection/MapServer",
   }).addTo(map);
 
-  // var parcels = L.esri.dynamicMapLayer({
-  //   url: "https://maps.lexingtonky.gov/lfucggis/rest/services/parcels/MapServer",
-  // });
-
   var addressPointsProvider = L.esri.Geocoding.mapServiceProvider({
     url: 'https://maps.lexingtonky.gov/lfucggis/rest/services/addresses/MapServer',
     layers: [0],
@@ -125,26 +121,22 @@
       .on(map)
       .at(addressLatLng)
       .run(function(error, featureCollection) {
-        // parcels.identify()
-        //   .returnGeometry(false)
-        //   .tolerance(0)
-        //   .on(map)
-        //   .at(addressLatLng)
-        //   .run(function(error, featureCollection) {
-        //   });
-
         if (featureCollection.features.length > 0) {
-          showDatePopup(map, addressLatLng, featureCollection.features[0].properties['Dates']);
+          leaves.setOpacity(0.7);
+          showDatePopup(map, addressLatLng, featureCollection.features[0].properties);
         }
     });
   }
 
-  var showDatePopup = function(map, addressLatLng, dates) {
+  var showDatePopup = function(map, addressLatLng, properties) {
+    var dates = properties['Dates'];
     if (!dates || dates === 'Null') {
       dates = "Because this address does not receive residential city waste services, it will not receive vacuum leaf collection.";
     } else {
       var datesLanguage = '<h3>Leaf vacuuming in your area is currently scheduled: ' + dates + '</h3>';
-      dates = datesLanguage + '<div class="citygram-form"><p>Sign up to receive text message notifications about your street\'s schedule.</p><p class="alert alert-error" style="display:none"></p><p class="sign-up"><label><strong>Enter your phone number (with area code)</strong> <input class="phone" name="phone" type="text"></label> <input type="submit" value="Notify me"></p></div>';
+      dates = datesLanguage + '<div class="citygram-form"><p>Sign up to receive text message notifications about your street\'s schedule.</p>' +
+        '<p class="alert alert-error" style="display:none"></p><p class="sign-up"><label><strong>Enter your phone number (with area code)</strong>' +
+          '<input class="phone" name="phone" type="text"></label> <input type="submit" value="Notify me"></p></div>';
     }
     var popup = L.popup({
           closeButton: false,
