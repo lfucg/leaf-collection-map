@@ -127,15 +127,16 @@
       .on(map)
       .at(latlng)
       .run(function(error, featureCollection) {
-        if (featureCollection.features.length > 0) {
-          leaves.setOpacity(0.7);
-          showDatePopup(map, latlng, featureCollection.features[0].properties);
-        }
+        var dates;
+        $.each(featureCollection.features, function(index, feature) {
+          if (feature.layerId === 5) { dates = feature.properties['Dates']; }
+        });
+        leaves.setOpacity(0.7);
+        showDatePopup(map, latlng, dates);
     });
   }
 
-  var showDatePopup = function(map, addressLatLng, properties) {
-    var dates = properties['Dates'];
+  var showDatePopup = function(map, addressLatLng, dates) {
     if (!dates || dates === 'Null') {
       dates = "Because this address does not receive residential city waste services, it will not receive vacuum leaf collection.";
     } else {
