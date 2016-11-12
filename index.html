@@ -226,7 +226,7 @@
         error = JSON.parse(response.responseText).error;
         error = error.replace(/phone_number/, phone);
       } catch (e) {
-        error = 'There was a problem signing-up. Please contact <a href="mailto:webmaster@lexingtonky.gov?subject=Unable to subscribe to citygram&body=details: ' + encodeURI(JSON.stringify(data)) + '">webmaster@lexingtonky.gov</a>';
+        error = 'There was a problem signing-up. Please contact <a href="mailto:webmaster@lexingtonky.gov?subject=Unable to subscribe to citygram&body=details: ' + encodeURI(JSON.stringify(subscription)) + '">webmaster@lexingtonky.gov</a>';
       }
       $('.alert-error').html(error).show();
     }
@@ -235,7 +235,7 @@
       type: 'PUT',
       url: url,
       contentType: 'application/json',
-      data: JSON.stringify({ subscription }),
+      data: JSON.stringify({subscription: subscription}),
     }).done(success).error(errorCallback);
   }
 
